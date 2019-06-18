@@ -1,0 +1,13 @@
+﻿@model IEnumerable<Hashtag>
+<div class="widget">
+    <h4 class="widget-title">Trend Hashtags</h4>
+    @foreach (Hashtag hashtag in Model)
+    {
+        <ul class="naves">
+            <li>
+                <i class="ti-clipboard"></i>
+                <a href="#" title="">@hashtag.HashTag (@hashtag.Quantity)</a>
+            </li>
+        </ul>
+    }
+</div><!-- Trend Hashtags -->

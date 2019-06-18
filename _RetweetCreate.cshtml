@@ -1,0 +1,69 @@
+﻿@model Tuple<Tweet, IEnumerable<Photo>, Video>
+
+<link rel="Stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.10/themes/redmond/jquery-ui.css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+<div class="form-control">
+    <label for="name">Retweet Text</label>
+    <input class="form-control retweetText" type="text" id="@Model.Item1.ID" />
+</div>
+<button id="@Model.Item1.ID" type="submit" style="background-color:cadetblue" class="add-butn Add">Tweet</button>
+@if (Model.Item2 != null && Model.Item3 != null)
+{
+    <div style="border:double">
+        @if (Model.Item2 != null)
+        {
+            foreach (Photo photo in Model.Item2)
+            {
+                <ul>
+                    <li><img src="@photo.ImagePath" title="" /></li>
+                </ul>
+            }
+        }
+        @if (Model.Item3 != null)
+        {
+            <video width="400" controls>
+                <source src="@Model.Item3.VideoPath" type="" />
+            </video>
+        }
+    </div>
+}
+<script type="text/javascript">
+    $(".retweetText").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/Administrator/Tweet/AutocompleteSearch",
+                type: "GET",
+                dataType: "json",
+                data: { term: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        if (item.name != undefined) {
+                            return { label: item.name, value: item.name };
+                        }
+                    }))
+                },
+            })
+        },
+        messages: {
+            noResults: "", results: ""
+        }
+    });
+
+    $(document).ready(function () {
+        $(this).on("click", ".Add", function () {
+            var id = $(this).attr("id");
+            var tr = "#" + id;
+            var tweettext = $(tr).val();
+            $.ajax({
+                type: 'POST',
+                url: '/Administrator/Tweet/Retweet',
+                data: { tweettext: tweettext, id: id },
+                success: function () {
+                    location.reload();
+                }
+            });
+        });
+    });
+</script>

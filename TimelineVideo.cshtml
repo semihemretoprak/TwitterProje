@@ -1,0 +1,119 @@
+﻿@model Tuple<List<Video>,AppUser>
+@{
+    ViewBag.Title = "TimelineVideo";
+}
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winku Social Network Toolkit</title>
+    <link rel="icon" href="images/fav.png" type="image/png" sizes="16x16">
+
+</head>
+<body>
+    <!--<div class="se-pre-con"></div>-->
+    <div class="theme-layout">
+        <section>
+            <div class="feature-photo">
+                @if (Model.Item2.UserCoverImagePath != null)
+                {
+                    <figure><img src="@Model.Item2.UserCoverImagePath" alt="" width="1366" height="400"></figure>
+                }
+                else
+                {
+                    <figure><img src="/Content/images/resources/timeline-1.jpg" alt="" /></figure>
+                }
+                @using (Html.BeginForm("AddCoverImage", "AppUser", new { area = "Administrator" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <div class="edit-phto">
+                        <i class="fa fa-camera-retro"></i>
+                        <label class="fileContainer">
+                            Edit Cover Photo
+                            <input type="file" name="CoverPhoto" />
+                        </label>
+                        <button type="submit">Add</button>
+                    </div>
+                }
+                <div class="container-fluid">
+                    <div class="row merged">
+                        <div class="col-lg-2 col-sm-3">
+                            <div class="user-avatar">
+                                <figure>
+                                    <img src="@Model.Item2.UserImagePath" alt="">
+                                    @using (Html.BeginForm("AddDisplayImage", "AppUser", new { area = "Administrator" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                    {
+                                        <div class="edit-phto">
+                                            <i class="fa fa-camera-retro"></i>
+                                            <label class="fileContainer">
+                                                Edit Display Photo
+                                                <input type="file" name="DisplayPhoto" />
+                                            </label>
+                                            <button type="submit">Add</button>
+                                        </div>
+                                    }
+
+                                </figure>
+                            </div>
+                        </div>
+                        <div class="col-lg-10 col-sm-9">
+                            <div class="timeline-info">
+                                <ul>
+                                    <li class="admin-name">
+                                        <h5>@Model.Item2.UserName</h5>
+                                    </li>
+                                    <li>
+                                        <a class="" href="/Home/TimeLine/@Model.Item2.ID" title="" data-ripple="">Time line</a>
+                                        <a class="" href="/Home/TimeLineFriend/@Model.Item2.ID" title="" data-ripple="">Time line Friend</a>
+                                        <a class="" href="/Home/TimelinePhoto/@Model.Item2.ID" title="" data-ripple="">Photos</a>
+                                        <a class="active" href="/Home/TimelineVideo/@Model.Item2.ID" title="" data-ripple="">Videos</a>
+                                        <a class="" href="/Home/Friends/@Model.Item2.ID" title="" data-ripple="">Friends</a>
+                                        <a class="" href="/Home/TimelineGroup/@Model.Item2.ID" title="" data-ripple="">Groups</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section><!-- top area -->
+        <section>
+            <div class="gap gray-bg">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row" id="page-contents">
+                                <div class="col-lg-3">
+                                    <aside class="sidebar static">
+                                        @{ Html.RenderAction("_HashtagList", "Home");}
+                                    </aside>
+                                </div><!-- sidebar -->
+                                <div class="col-lg-6">
+                                    <div class="central-meta">
+                                        @foreach (Video video in Model.Item1)
+                                        {
+                                            <ul class="photos">
+                                                <li>
+                                                    <video width="400" controls>
+                                                        <source src="@video.VideoPath" type="" />
+                                                    </video>
+                                                </li>
+                                            </ul>
+                                        }
+                                    </div><!-- photos -->
+                                </div><!-- centerl meta -->
+                                <div class="col-lg-3">
+                                </div><!-- sidebar -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+
+
+</html>

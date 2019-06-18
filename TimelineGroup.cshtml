@@ -1,0 +1,167 @@
+﻿@model Tuple<List<Group>, AppUser>
+@{
+    ViewBag.Title = "TimelineGroup";
+}
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winku Social Network Toolkit</title>
+    <link rel="icon" href="images/fav.png" type="image/png" sizes="16x16">
+
+</head>
+<body>
+    <!--<div class="se-pre-con"></div>-->
+    <div class="theme-layout">
+        <section>
+            <div class="feature-photo">
+                @if (Model.Item2.UserCoverImagePath != null)
+                {
+                    <figure><img src="@Model.Item2.UserCoverImagePath" alt="" width="1366" height="400"></figure>
+                }
+                else
+                {
+                    <figure><img src="/Content/images/resources/timeline-1.jpg" alt="" /></figure>
+                }
+                @using (Html.BeginForm("AddCoverImage", "AppUser", new { area = "Administrator" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <div class="edit-phto">
+                        <i class="fa fa-camera-retro"></i>
+                        <label class="fileContainer">
+                            Edit Cover Photo
+                            <input type="file" name="CoverPhoto" />
+                        </label>
+                        <button type="submit">Add</button>
+                    </div>
+                }
+                <div class="container-fluid">
+                    <div class="row merged">
+                        <div class="col-lg-2 col-sm-3">
+                            <div class="user-avatar">
+                                <figure>
+                                    <img src="@Model.Item2.UserImagePath" alt="">
+                                    @using (Html.BeginForm("AddDisplayImage", "AppUser", new { area = "Administrator" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                    {
+                                        <div class="edit-phto">
+                                            <i class="fa fa-camera-retro"></i>
+                                            <label class="fileContainer">
+                                                Edit Display Photo
+                                                <input type="file" name="DisplayPhoto" />
+                                            </label>
+                                            <button type="submit">Add</button>
+                                        </div>
+                                    }
+
+                                </figure>
+                            </div>
+                        </div>
+                        <div class="col-lg-10 col-sm-9">
+                            <div class="timeline-info">
+                                <ul>
+                                    <li class="admin-name">
+                                        <h5>@Model.Item2.UserName</h5>
+                                    </li>
+                                    <li>
+                                        <a class="" href="/Home/TimeLine/@Model.Item2.ID" title="" data-ripple="">Time line</a>
+                                        <a class="" href="/Home/TimeLineFriend/@Model.Item2.ID" title="" data-ripple="">Time line Friend</a>
+                                        <a class="" href="/Home/TimelinePhoto/@Model.Item2.ID" title="" data-ripple="">Photos</a>
+                                        <a class="" href="/Home/TimelineVideo/@Model.Item2.ID" title="" data-ripple="">Videos</a>
+                                        <a class="" href="/Home/Friends/@Model.Item2.ID" title="" data-ripple="">Friends</a>
+                                        <a class="active" href="/Home/TimelineGroup/@Model.Item2.ID" title="" data-ripple="">Groups</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section><!-- top area -->
+        <section>
+            <div class="gap gray-bg">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row" id="page-contents">
+                                <div class="col-lg-3">
+                                    <aside class="sidebar static">
+                                        @{ Html.RenderAction("_HashtagList", "Home");}
+                                    </aside>
+                                </div><!-- sidebar -->
+                                <div class="col-lg-6">
+                                    <div class="central-meta">
+                                        <div class="groups">
+                                            @Html.ActionLink("Add Group", "GroupInsert", "Home", new { id = Model.Item2.ID }, new { @class = "add-butn" })
+                                            <hr />
+                                            <h2>Groups</h2>
+                                            @foreach (Group item in Model.Item1)
+                                            {
+                                                if (item.GroupOwner != Model.Item2.UserName)
+                                                {
+                                                    GroupUserService gus = new GroupUserService();
+                                                    <ul class="nearby-contct">
+                                                        <li>
+                                                            <div class="nearly-pepls">
+                                                                <figure>
+                                                                    <img src="@Model.Item2.UserImagePath" alt="">
+                                                                </figure>
+                                                                <div class="pepl-info">
+                                                                    <h4>@item.Name</h4>
+                                                                    @if (!gus.GetActive().Where(x => x.GroupID == item.ID).Any(p => p.AppUserID == Model.Item2.ID))
+                                                                    {
+                                                                        @Html.ActionLink("Join", "GroupTransactions", "Home", new { Groupid = item.ID, Appuserid = Model.Item2.ID, Join = true, groupDelete = false, leaveGroup = false }, new { @class = "add-butn" })
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @Html.ActionLink("Leave Group", "GroupTransactions", "Home", new { Appuserid = Model.Item2.ID, Groupid = item.ID, leaveGroup = true, Join = false, groupDelete = false }, new { @class = "add-butn" })
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                }
+                                            }
+
+                                            <hr />
+                                            <h2>My Groups</h2>
+
+                                            @foreach (Group item1 in Model.Item1)
+                                            {
+                                                if (item1.GroupOwner == Model.Item2.UserName)
+                                                {
+                                                    GroupUserService gus = new GroupUserService();
+                                                    <ul class="nearby-contct">
+                                                        <li>
+                                                            <div class="nearly-pepls">
+                                                                <figure>
+                                                                    <img src="@Model.Item2.UserImagePath" alt="">
+                                                                </figure>
+                                                                <div class="pepl-info">
+                                                                    <h4>@item1.Name</h4>
+                                                                    @Html.ActionLink("Group Delete", "GroupTransactions", "Home", new { Groupid = item1.ID, Appuserid = Model.Item2.ID, groupDelete = true, leaveGroup = false, Join = false }, new { @class = "add-butn" })
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                }
+                                            }
+                                        </div>
+                                    </div><!-- photos -->
+                                </div><!-- centerl meta -->
+                                <div class="col-lg-3">
+                                    <aside class="sidebar static">
+                                        @{ Html.RenderAction("_FollowList", "Home");}
+                                    </aside>
+                                </div><!-- sidebar -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,136 @@
+﻿@model Tweet
+@{
+    ViewBag.Title = "HomePage";
+}
+@if (Session["oturum"]==null)
+{
+    Response.RedirectPermanent("/Login/Login");
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="Stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.10/themes/redmond/jquery-ui.css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winku Social Network Toolkit</title>
+    <link rel="icon" href="~/Content/images/fav.png" type="image/png" sizes="16x16">
+</head>
+<body>
+    <!--<div class="se-pre-con"></div>-->
+    <div class="theme-layout">
+        <section>
+            <div class="gap gray-bg">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row" id="page-contents">
+                                <div class="col-lg-3">
+                                    <aside class="sidebar static">
+                                        @{ Html.RenderAction("_HashtagList", "Home");}
+                                        @{ Html.RenderAction("_WhoToFollowList", "Home");}
+                                    </aside>
+                                </div><!-- sidebar -->
+                                <div class="col-lg-6">
+                                    @{ AppUser gelen = (AppUser)Session["oturum"];}
+                                    @using (Html.BeginForm("HomePage", "Home", new { area = " " }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                    {
+
+                                        <div class="central-meta">
+                                            <div class="new-postbox">
+                                                <figure>
+                                                    <img src="@gelen.UserImagePath" alt="">
+                                                </figure>
+                                                <div class="newpst-input">
+                                                    @Html.TextAreaFor(m => m.TweetText, new { @rows = "2", @placeholder = "write something", @class = "txtYorum" })
+                                                    <div class="attachments">
+                                                        <ul>
+                                                            <li>
+                                                                <i class="fa fa-camera"></i>
+                                                                <label class="fileContainer">
+                                                                    <input type="file" multiple name="photoVideo" id="photoVideo">
+                                                                </label>
+                                                            </li>
+                                                            <li>
+                                                                <button type="submit">Post</button>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!-- add post new box -->
+                                    }
+                                    <div class="loadMore">
+                                        <div class="central-meta item">
+                                            @{ Html.RenderAction("_TweetList", "Home");}
+                                        </div>
+                                    </div>
+                                </div><!-- centerl meta -->
+                                <div class="col-lg-3">
+                                    <aside class="sidebar static">
+                                        <div class="widget">
+                                            <h4 class="widget-title">Your page</h4>
+                                            <div class="your-page">
+                                                <figure>
+                                                    <a href="~/Home/TimeLine/@gelen.ID" title=""><img src="@gelen.UserImagePath" alt=""></a>
+                                                </figure>
+                                                <div class="page-likes">
+                                                    <!-- Tab panes -->
+                                                    <div class="tab-content">
+                                                        <span>@gelen.UserName</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!-- page like widget -->
+                                        @{ Html.RenderAction("_FollowList", "Home");}
+                                    </aside>
+                                </div><!-- sidebar -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+
+</html>
+<script type="text/javascript">
+    $(".txtYorum").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/Administrator/Tweet/AutocompleteSearch",
+                type: "GET",
+                dataType: "json",
+                data: { term: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        if (item.name != undefined) {
+                            return { label: item.name, value: item.name };
+                        }
+                    }))
+                },
+            })
+        },
+        messages: {
+            noResults: "", results: ""
+        }
+    });
+    $(document).ready(function () {
+        $(this).on("click", ".btnMessage", function () {
+            var id = $(this).attr("id");
+            var tr = "#" + id;
+            var messageText = $(tr).val();
+            $.ajax({
+                type: 'POST',
+                url: '/Administrator/Message/Insert',
+                data: { messageText: messageText, id: id },
+                success: function () {
+                    location.reload();
+                }
+            });
+        });
+    });
+</script>
+

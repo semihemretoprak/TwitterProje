@@ -1,0 +1,88 @@
+﻿@model Tuple<Follower, IEnumerable<Message>>
+@{
+    ViewBag.Title = "FollowMessage";
+}
+
+<div style="width:auto;height:auto">
+    <div class="chat-head">
+        <span class="status f-online"></span>
+        <h6>@Model.Item1.DAppUser.UserName</h6>
+        <div class="more">
+            <span><i class="ti-more-alt"></i></span>
+            <span class="close-mesage"><i class="ti-close"></i></span>
+        </div>
+    </div>
+    <div class="chat-list">
+        <ul>
+            @if (Model.Item2 != null)
+            {
+                AppUser gelen = (AppUser)Session["oturum"];
+                foreach (Message item in Model.Item2)
+                {
+                    if (gelen.ID == item.AppUserID)
+                    {
+                        <li class="me">
+                            @if (gelen.ID == item.AppUserID)
+                            {
+                                <div class="chat-thumb"><img src="@item.AppUser.UserImagePath" alt=""></div>
+                            }
+                            else if (gelen.ID == item.DAppUserID)
+                            {
+                                <div class="chat-thumb"><img src="@item.DAppUser.UserImagePath" alt=""></div>
+                            }
+                            <div class="notification-event">
+                                <span class="chat-message-item">
+                                    @item.Description
+                                </span>
+                                <span class="notification-date"><time datetime="@item.CreatedDate" class="entry-date updated">@item.CreatedDate</time></span>
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="you">
+                            @if (gelen.ID == item.AppUserID)
+                            {
+                                <div class="chat-thumb"><img src="@item.AppUser.UserImagePath" alt=""></div>
+                            }
+                            else if (gelen.ID == item.DAppUserID)
+                            {
+                                <div class="chat-thumb"><img src="@item.DAppUser.UserImagePath" alt=""></div>
+                            }
+                            <div class="notification-event">
+                                <span class="chat-message-item">
+                                    @item.Description
+                                </span>
+                                <span class="notification-date"><time datetime="@item.CreatedDate" class="entry-date updated">@item.CreatedDate</time></span>
+                            </div>
+                        </li>
+                    }
+                }
+            }
+        </ul>
+        <form>
+            <div class="attachments">
+                <input class="form-control txtMessage" type="text" name="messageText" id="@Model.Item1.DAppUserID" />
+                <button id="@Model.Item1.DAppUserID" class="btnMessage" type="submit">Gönder</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(this).on("click", ".btnMessage", function () {
+            var id = $(this).attr("id");
+            var tr = "#" + id;
+            var messageText = $(tr).val();
+            $.ajax({
+                type: 'POST',
+                url: '/Administrator/Message/Insert',
+                data: { messageText: messageText, id: id },
+                success: function () {
+                    location.reload();
+                }
+            });
+        });
+    });
+</script>

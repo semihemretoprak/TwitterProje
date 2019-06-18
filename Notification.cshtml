@@ -1,0 +1,222 @@
+﻿@model Tuple<AppUser, List<Like>, List<Comment>, List<Follower>>
+@{
+    ViewBag.Title = "Notification";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div class="theme-layout">
+        <section>
+            <div class="feature-photo">
+                @if (Model.Item1.UserCoverImagePath != null)
+                {
+                    <figure><img src="@Model.Item1.UserCoverImagePath" alt=""></figure>
+                }
+                else
+                {
+                    <figure><img src="/Content/images/resources/timeline-1.jpg" alt="" /></figure>
+                }
+                @using (Html.BeginForm("AddCoverImage", "AppUser", new { area = "Administrator" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <div class="edit-phto">
+                        <i class="fa fa-camera-retro"></i>
+                        <label class="fileContainer">
+                            Edit Cover Photo
+                            <input type="file" name="CoverPhoto" />
+                        </label>
+                        <button type="submit">Add</button>
+                    </div>
+                }
+                <div class="container-fluid">
+                    <div class="row merged">
+                        <div class="col-lg-2 col-sm-3">
+                            <div class="user-avatar">
+                                <figure>
+                                    <img src="@Model.Item1.UserImagePath" alt="">
+                                    @using (Html.BeginForm("AddDisplayImage", "AppUser", new { area = "Administrator" }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                    {
+                                        <div class="edit-phto">
+                                            <i class="fa fa-camera-retro"></i>
+                                            <label class="fileContainer">
+                                                Edit Display Photo
+                                                <input type="file" name="DisplayPhoto" />
+                                            </label>
+                                            <button type="submit">Add</button>
+                                        </div>
+                                    }
+
+                                </figure>
+                            </div>
+                        </div>
+                        <div class="col-lg-10 col-sm-9">
+                            <div class="timeline-info">
+                                <ul>
+                                    <li class="admin-name">
+                                        <h5>@Model.Item1.UserName</h5>
+                                    </li>
+                                    <li>
+                                        <a class="active" href="/Home/TimeLine/@Model.Item1.ID" title="" data-ripple="">Time line</a>
+                                        <a class="" href="/Home/TimeLineFriend/@Model.Item1.ID" title="" data-ripple="">Time line Friend</a>
+                                        <a class="" href="/Home/TimelinePhoto/@Model.Item1.ID" title="" data-ripple="">Photos</a>
+                                        <a class="" href="/Home/TimelineVideo/@Model.Item1.ID" title="" data-ripple="">Videos</a>
+                                        <a class="" href="/Home/Friends/@Model.Item1.ID" title="" data-ripple="">Friends</a>
+                                        <a class="" href="/Home/TimelineGroup/@Model.Item1.ID" title="" data-ripple="">Groups</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section>
+            <div class="gap gray-bg">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row" id="page-contents">
+                                <div class="col-lg-3">
+                                    <aside class="sidebar static">
+                                        @{ Html.RenderAction("_HashtagList", "Home");}
+                                        @{ Html.RenderAction("_WhoToFollowList", "Home");}
+                                    </aside>
+                                </div><!-- sidebar -->
+                                <div class="col-lg-6">
+                                    <div class="central-meta">
+                                        <div class="editing-interest">
+                                            <h5 class="f-title"><i class="ti-bell"></i>All Notifications </h5>
+                                            <div class="notification-box">
+                                                @if (Model.Item2 != null || Model.Item3 != null || Model.Item4 != null)
+                                                {
+                                                    TweetService ts = new TweetService();
+                                                    foreach (Tweet tweet in ts.GetActive())
+                                                    {
+                                                        if (tweet.TweetText.Contains(Model.Item1.UserName))
+                                                        {
+                                                            TimeSpan sonuc = DateTime.Now.Date - Convert.ToDateTime(tweet.CreatedDate).Date;
+                                                            <ul>
+                                                                <li>
+                                                                    <figure><img src="@tweet.AppUser.UserImagePath" alt=""></figure>
+                                                                    <div class="notifi-meta">
+                                                                        <p>@tweet.AppUser.UserName mentioned you</p>
+                                                                        @if (sonuc.TotalMinutes <= 60)
+                                                                        {
+                                                                            <span>@sonuc.TotalMinutes Minute ago</span>
+                                                                        }
+                                                                        else if (sonuc.TotalHours <= 24)
+                                                                        {
+                                                                            <span>@sonuc.TotalHours hour ago</span>
+                                                                        }
+                                                                        else if (sonuc.TotalHours > 24)
+                                                                        {
+                                                                            <span>@sonuc.TotalDays Day ago</span>
+                                                                        }
+                                                                    </div>
+                                                                    <i class="del fa fa-close"></i>
+                                                                </li>
+                                                            </ul>
+                                                        }
+                                                    }
+                                                    foreach (Like like in Model.Item2)
+                                                    {
+                                                        if (like != null)
+                                                        {
+                                                            TimeSpan sonuc = DateTime.Now.Date - Convert.ToDateTime(like.CreatedDate).Date;
+                                                            <ul>
+                                                                <li>
+                                                                    <figure><img src="@like.AppUser.UserImagePath" alt=""></figure>
+                                                                    <div class="notifi-meta">
+                                                                        <p>@like.AppUser.UserName like your post</p>
+                                                                        @if (sonuc.TotalMinutes <= 60)
+                                                                        {
+                                                                            <span>@sonuc.TotalMinutes Minute ago</span>
+                                                                        }
+                                                                        else if (sonuc.TotalHours <= 24)
+                                                                        {
+                                                                            <span>@sonuc.TotalHours hour ago</span>
+                                                                        }
+                                                                        else if (sonuc.TotalHours > 24)
+                                                                        {
+                                                                            <span>@sonuc.TotalDays Day ago</span>
+                                                                        }
+                                                                    </div>
+                                                                    <i class="del fa fa-close"></i>
+                                                                </li>
+                                                            </ul>
+                                                        }
+                                                    }
+                                                    foreach (Comment comment in Model.Item3)
+                                                    {
+                                                        if (comment != null)
+                                                        {
+                                                            TimeSpan sonuc = DateTime.Now.Date - Convert.ToDateTime(comment.CreatedDate).Date;
+                                                            <ul>
+                                                                <li>
+                                                                    <figure><img src="@comment.AppUser.UserImagePath" alt=""></figure>
+                                                                    <div class="notifi-meta">
+                                                                        <p>@comment.AppUser.UserName Commented On Your Post.</p>
+                                                                        <span>@sonuc hour ago</span>
+                                                                    </div>
+                                                                    @if (sonuc.TotalMinutes <= 60)
+                                                                    {
+                                                                        <span>@sonuc.TotalMinutes Minute ago</span>
+                                                                    }
+                                                                    else if (sonuc.TotalHours <= 24)
+                                                                    {
+                                                                        <span>@sonuc.TotalHours hour ago</span>
+                                                                    }
+                                                                    else if (sonuc.TotalHours > 24)
+                                                                    {
+                                                                        <span>@sonuc.TotalDays Day ago</span>
+                                                                    }
+                                                                </li>
+                                                            </ul>
+                                                        }
+                                                    }
+                                                    foreach (Follower follower in Model.Item4)
+                                                    {
+                                                        if (follower != null)
+                                                        {
+                                                            TimeSpan sonuc = DateTime.Now.Date - Convert.ToDateTime(follower.CreatedDate).Date;
+                                                            <ul>
+                                                                <li>
+                                                                    <figure><img src="@follower.AppUser.UserImagePath" alt=""></figure>
+                                                                    <div class="notifi-meta">
+                                                                        <p>@follower.AppUser.UserName Added as friend</p>
+                                                                        @if (sonuc.TotalMinutes <= 60)
+                                                                        {
+                                                                            <span>@sonuc.TotalMinutes Minute ago</span>
+                                                                        }
+                                                                        else if (sonuc.TotalHours <= 24)
+                                                                        {
+                                                                            <span>@sonuc.TotalHours hour ago</span>
+                                                                        }
+                                                                        else if (sonuc.TotalHours > 24)
+                                                                        {
+                                                                            <span>@sonuc.TotalDays Day ago</span>
+                                                                        }
+                                                                    </div>
+                                                                    <i class="del fa fa-close"></i>
+                                                                </li>
+                                                            </ul>
+                                                        }
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div><!-- centerl meta -->
+                                    <div class="col-lg-3">
+                                    </div><!-- sidebar -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+
+</html>
+

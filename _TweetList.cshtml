@@ -1,0 +1,380 @@
+﻿@model IEnumerable<Tweet>
+<link rel="Stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.10/themes/redmond/jquery-ui.css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
+@foreach (Tweet tweet in Model)
+{
+
+    AppUser gelen = (AppUser)Session["oturum"];
+    PhotoService ps = new PhotoService();
+    VideoService vs = new VideoService();
+    CommentService cs = new CommentService();
+    AppUserService aus = new AppUserService();
+    TweetService ts = new TweetService();
+    var photo = ps.GetActive().Where(x => x.TweetID == tweet.ID);
+    var comment = cs.GetActive().Where(x => x.TweetID == tweet.ID);
+    <div class="user-post">
+        <div class="friend-info">
+            @if (tweet.RetweetID != null)
+            {
+                Guid TweetID = new Guid(tweet.RetweetID.ToString());
+                var Tweet = ts.GetByID(TweetID);
+                <h5>Retweet</h5>
+                <div class="friend-info">
+                    <figure>
+                        <img src="@Tweet.AppUser.UserImagePath" alt="">
+                    </figure>
+                    <div class="friend-name">
+                        @if (tweet.AppUserID != gelen.ID)
+                        {
+                            <ins><a href="~/Home/TimeLineFriend/@tweet.AppUserID" title="">@tweet.AppUser.UserName</a></ins>
+                        }
+                        else
+                        {
+                            <ins><a href="~/Home/TimeLine/@tweet.AppUserID" title="">@tweet.AppUser.UserName</a></ins>
+                        }
+                    </div>
+                </div>
+                <div class="description">
+                    <p>
+                        @tweet.TweetText
+                    </p>
+                </div>
+                <hr />
+                <div class="friend-info" style="border-top-color:black">
+                    <figure>
+                        <img src="@tweet.AppUser.UserImagePath" alt="">
+                    </figure>
+                    <div class="friend-name">
+                        @if (Tweet.AppUserID != gelen.ID)
+                        {
+                            <ins><a href="~/Home/TimeLineFriend/@Tweet.AppUserID" title="">@Tweet.AppUser.UserName</a></ins>
+                        }
+                        else
+                        {
+                            <ins><a href="~/Home/TimeLine/@Tweet.AppUserID" title="">@Tweet.AppUser.UserName</a></ins>
+                        }
+                        <span>published: @tweet.CreatedDate</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="friend-info">
+                    <figure>
+                        <img src="@tweet.AppUser.UserImagePath" alt="">
+                    </figure>
+                    <div class="friend-name">
+                        @if (tweet.AppUserID != gelen.ID)
+                        {
+                            <ins><a href="~/Home/TimeLineFriend/@tweet.AppUserID" title="">@tweet.AppUser.UserName</a></ins>
+                        }
+                        else
+                        {
+                            <ins><a href="~/Home/TimeLine/@tweet.AppUserID" title="">@tweet.AppUser.UserName</a></ins>
+                        }
+                        <span>published: @tweet.CreatedDate</span>
+                    </div>
+                </div>
+            }
+            <div class="post-meta">
+                @if (tweet.RetweetID != null)
+                {
+                    var tweetText = ts.GetByID((Guid)tweet.RetweetID);
+                    <div class="description">
+                        <p>
+                            @tweetText.TweetText
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div class="description">
+                        <p>
+                            @tweet.TweetText
+                        </p>
+                    </div>
+                }
+                @if (tweet.RetweetID != null)
+                {
+                    Guid retweetID = new Guid(tweet.RetweetID.ToString());
+                    var tweetItem = ts.GetByDefault(m => m.ID == retweetID);
+                    photo = ps.GetAll().Where(x => x.TweetID == tweetItem.ID);
+                    foreach (Photo photoItem in photo)
+                    {
+                        <img src="@photoItem.ImagePath" alt="">
+                    }
+                }
+                else
+                {
+                    foreach (Photo photoItem1 in photo)
+                    {
+                        <img src="@photoItem1.ImagePath" alt="">
+                    }
+                }
+
+
+                @if (tweet.RetweetID != null)
+                {
+                    Guid retweetID = new Guid(tweet.RetweetID.ToString());
+                    var tweetItem = ts.GetByDefault(m => m.ID == retweetID);
+                    if (tweetItem.TweetVideoID != null)
+                    {
+                        var tweetVideoID = tweet.TweetVideoID.ToString();
+                        Guid id = Guid.Parse(tweetVideoID);
+                        Video video = vs.GetByID(id);
+                        <video width="400" controls>
+                            <source src="@video.VideoPath" type="" />
+                        </video>
+                    }
+
+                }
+                else
+                {
+                    if (tweet.TweetVideoID != null)
+                    {
+                        var tweetVideoID = tweet.TweetVideoID.ToString();
+                        Guid id = Guid.Parse(tweetVideoID);
+                        Video video = vs.GetByID(id);
+                        <video width="400" controls>
+                            <source src="@video.VideoPath" type="" />
+                        </video>
+                    }
+                }
+                <div class="we-video-info">
+                    <ul>
+                        <li>
+                            @{ var guid = Guid.NewGuid();}
+                            <span class="comment Yorum" id="@guid" data-toggle="tooltip" title="Comments">
+                                <i class="fa fa-comments-o"></i>
+                                <ins>@tweet.Comments.Count(p => p.TweetID == tweet.ID)</ins>
+                            </span>
+                        </li>
+                        <li>
+                            @{ var like = Guid.NewGuid();}
+                            <span class="dislike btnLike" data-id="@tweet.ID" id="@like" data-toggle="tooltip" title="like">
+                                <i class="fa fa-heart"></i>
+                                <label id="#@like">@tweet.Like</label>
+                            </span>
+                        </li>
+                        <li>
+                            @{ var dislike = Guid.NewGuid();}
+                            <span class="btnDisLike" style="color:deepskyblue" data-id="@tweet.ID" id="@dislike" data-toggle="tooltip" title="dislike">
+                                <i class="fa fa-heart-o"></i>
+                                <label id="#@dislike">@tweet.Dislike</label>
+                            </span>
+                        </li>
+                        <li class="social-media">
+                            @{ var retweet = Guid.NewGuid();}
+                            <span class="retweet" data-toggle="tooltip" id="@retweet" title="Retweet">
+                                <i class="fa fa-retweet"></i>
+                                <label>@tweet.Retweet</label>
+                            </span>                            
+                            <div id="#@retweet" style="display:none">
+                                @if (tweet.RetweetID != null)
+                                {
+                                    { Html.RenderAction("_RetweetCreate", "Home", new { id = tweet.RetweetID }); }
+                                }
+                                else
+                                {
+                                    { Html.RenderAction("_RetweetCreate", "Home", new { id = tweet.ID }); }
+                                }
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="coment-area">
+            <div id="#@guid" style="display:none">
+                <ul class="we-comet">
+                    @foreach (Comment itemComment in comment)
+                    {
+                        var ID = Guid.NewGuid();
+                        var reviewOfComment = cs.GetAll().Where(x => x.CommentID == itemComment.ID);
+                        TimeSpan sonuc = DateTime.Now - Convert.ToDateTime(itemComment.CreatedDate);
+                        <li>
+                            <div class="comet-avatar">
+                                <img src="@itemComment.AppUser.UserImagePath" alt="">
+                            </div>
+                            <div class="we-comment">
+                                <div class="coment-head">
+                                    <h5>@Html.ActionLink(itemComment.AppUser.UserName, "TimeLine", "Home", new { id = itemComment.AppUserID }, null)</h5>
+                                    <span>@sonuc.Days.ToString()</span>
+                                    <button id="@ID" class="cevapla">Cevapla</button>
+                                    <div class="myDIV" id="#@ID" style="display:none">
+                                        <input class="form-control txtYorum" type="text" name="commenttext" id="@itemComment.ID" />
+                                        <button id="@itemComment.ID" type="submit" class="add-butn reply">Yorum Yap</button>
+                                    </div>
+                                </div>
+                                <p>@itemComment.TweetComment</p>
+                            </div>
+                            @foreach (Comment itemReviewofComment in reviewOfComment)
+                            {
+                                TimeSpan sonuc1 = DateTime.Now - Convert.ToDateTime(itemReviewofComment.CreatedDate);
+                                <ul>
+                                    <li>
+                                        <div class="comet-avatar">
+                                            <img src="@itemReviewofComment.AppUser.UserImagePath" alt="">
+                                        </div>
+                                        <div class="we-comment">
+                                            <div class="coment-head">
+                                                <h5>@Html.ActionLink(itemReviewofComment.AppUser.UserName, "TimeLine", "Home", new { id = itemComment.AppUserID }, null)</h5>
+                                                <span>@sonuc1.Days.ToString()</span>
+                                            </div>
+                                            <p>@itemReviewofComment.TweetComment</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="form-control">
+                <input class="form-control txtYorum" type="text" name="commenttext" id="@tweet.ID" />
+                <button id="@tweet.ID" type="submit" class="add-butn btnYorum">Yorum Yap</button>
+            </div>
+
+        </div>
+    </div>
+    <hr />
+}
+<script type="text/javascript">
+    $(".txtYorum").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "/Administrator/Tweet/AutocompleteSearch",
+                type: "GET",
+                dataType: "json",
+                data: { term: request.term },
+                success: function (data) {
+                    response($.map(data, function (item) {
+                        if (item.UserName != undefined) {
+                            return { label: item.UserName, value: item.UserName };
+                        }
+                        return { label: item.HashTag, value: item.HashTag };
+                    }))
+                },
+            })
+        },
+        messages: {
+            noResults: "", results: ""
+        }
+    });
+
+    $(document).ready(function () {
+        $(this).on("click", ".Yorum", function () {
+            var id = $(this).attr("id");
+            var x = document.getElementById("#" + id);
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        });
+    });
+    $(document).ready(function () {
+        $(this).on("click", ".retweet", function () {
+            var id = $(this).attr("id");
+            var x = document.getElementById("#" + id);
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        });
+    });
+    $(document).ready(function () {
+        $(this).on("click", ".btnLike", function yenile() {
+            var id = $(this).data("id");
+            var name = $(this).attr("id");
+            var tr = "#" + name;
+            var x = document.getElementById(tr);
+            $.ajax({
+                url: '/Administrator/Tweet/Like/' + id,
+                type: 'POST',
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data.errortext == undefined) {
+                        x.innerText = data;
+                    }
+                    else {
+                        alert(data.errortext);
+                    }
+                }
+            });
+        });
+    });
+    $(document).ready(function () {
+        $(this).on("click", ".btnDisLike", function yenile() {
+            var id = $(this).data("id");
+            var name = $(this).attr("id");
+            var tr = "#" + name;
+            var x = document.getElementById(tr);
+            $.ajax({
+                url: '/Administrator/Tweet/DisLike/' + id,
+                type: 'POST',
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data.errortext == undefined) {
+                        x.innerText = data;
+                    }
+                    else {
+                        alert(data.errortext);
+                    }
+                }
+            });
+        });
+    });
+    $(document).ready(function () {
+        $(this).on("click", ".btnYorum", function () {
+            var id = $(this).attr("id");
+            var tr = "#" + id;
+            var commenttext = $(tr).val();
+            alert(commenttext);
+            $.ajax({
+                type: 'POST',
+                url: '/Administrator/Tweet/CommentInsert',
+                data: { commenttext: commenttext, id: id },
+                success: function (data) {
+                    if (data.result == 1) {
+                        alert(data.message);
+                    }
+                    location.reload();
+                }
+            });
+        });
+    });
+    $(document).ready(function () {
+        $(this).on("click", ".reply", function () {
+            var id = $(this).attr("id");
+            var tr = "#" + id;
+            var commenttext = $(tr).val();
+            $.ajax({
+                type: 'POST',
+                url: '/Administrator/Tweet/ReviewOfComment',
+                data: { commenttext: commenttext, id: id },
+                success: function (data) {
+                    if (data.result == 1) {
+                        alert(data.message);
+                    }
+                    location.reload();
+                }
+            });
+        });
+    });
+    $(document).ready(function () {
+        $(this).on("click", ".cevapla", function () {
+            var id = $(this).attr("id");
+            var ID = "#" + id;
+            var x = document.getElementById(ID);
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        });
+    });
+</script>

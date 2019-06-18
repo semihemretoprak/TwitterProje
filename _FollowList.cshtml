@@ -1,0 +1,22 @@
+﻿@model IEnumerable<Follower>
+
+<div class="widget friend-list stick-widget">
+    <h4 class="widget-title">Friends</h4>
+    <div id="searchDir"></div>
+    @foreach (Follower item in Model)
+    {
+        <ul id="people-list">
+            <li>
+                <figure>
+                    <img src="@item.DAppUser.UserImagePath" alt="">
+                    <span class="status f-online"></span>
+                </figure>
+                <div class="friendz-meta">
+                    <span>@item.AppUser.UserName</span>
+                    <a href="" onclick="javascript: window.open('/Home/FollowMessage/@item.DAppUser.ID', '', 'toolbar=0, location=yes, left=100px, top=200px, status=no, menubar=no, scrollbars=no, resizable=1, width=1000, height=500'); return false"> Mesaj Gönder </a>
+                </div>
+
+            </li>
+        </ul>
+    }
+</div><!-- friends list sidebar -->

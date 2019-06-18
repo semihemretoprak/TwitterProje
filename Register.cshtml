@@ -1,0 +1,127 @@
+﻿@model AppUser
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winku Social Network Toolkit</title>
+    <link rel="icon" href="images/fav.png" type="image/png" sizes="16x16">
+    @Styles.Render("~/styles/css")
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script>
+        $(function () {
+            $("#CountryID").change(function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/Administrator/AppUser/GetCity',
+                    dataType: 'json',
+                    data: { id: $("#CountryID").val() },
+                    success: function (city) {
+                        $.each(city, function (i, city) {
+                            $("#CityID").append('<option value="' + city.Value + '">"' + city.Text + '"</option>')
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <!--<div class="se-pre-con"></div>-->
+    <div class="theme-layout">
+        <div class="container-fluid pdng0">
+            <div class="row merged">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="land-featurearea">
+                        <div class="land-meta">
+                            <h1>Winku</h1>
+                            <p>
+                                Winku is free to use for as long as you want with two active projects.
+                            </p>
+                            <div class="friend-logo">
+                                <span><img src="~/Content/images/wink.png" alt=""></span>
+                            </div>
+                            <a href="#" title="" class="folow-me">Follow Us on</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="login-reg-bg">
+                        <div class="log-reg-area sing">
+                            <h2 class="log-title">Register</h2>
+                            <form action="/Login/Register" method="post">
+                                <div class="form-group">
+                                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", required = "required-entry", onkeypress = "return event.charCode >= 64 && event.charCode<=90 || event.charCode >= 97 && event.charCode<=122 "})
+                                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                                    <label class="control-label" for="input">First Name</label><i class="mtrl-select"></i>
+                                </div>
+                                <div class="form-group">
+                                    @Html.TextBoxFor(m => m.SurName, new { @class = "form-control", required = "required-entry", onkeypress = "return event.charCode >= 64 && event.charCode<=90 || event.charCode >= 97 && event.charCode<=122 " })
+                                    @Html.ValidationMessageFor(model => model.SurName, "", new { @class = "text-danger" })
+                                    <label class="control-label" for="input">Last Name</label><i class="mtrl-select"></i>
+                                </div>
+                                <div class="form-group">
+                                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", required = "required-entry", onkeypress = "return event.charCode >= 64 && event.charCode<=90 || event.charCode >= 97 && event.charCode<=122 " })
+                                    @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                                    <label class="control-label" for="input">User Name</label><i class="mtrl-select"></i>
+                                </div>
+                                <div class="form-group">
+                                    @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @type = "password" })
+                                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                                    <label class="control-label" for="input">Password</label><i class="mtrl-select"></i>
+                                </div>
+                                <div class="form-group">
+                                    @Html.TextBoxFor(m => m.EmailAddress, new { @class = "form-control",required = "required-entry",validate = "email",type = "email" })
+                                    @Html.ValidationMessageFor(model => model.EmailAddress, "", new { @class = "text-danger" })
+                                    <label class="control-label" for="input">E-Mail Address</label><i class="mtrl-select"></i>
+                                </div>
+                                <div class="form-group">
+                                    @Html.DropDownListFor(m => m.Location.CountryID, ViewBag.CountryID as SelectList, "--Country--", htmlAttributes: new { @class = "form-control", id = "CountryID" })
+                                    @Html.ValidationMessageFor(model => model.Location.CountryID, "", new { @class = "text-danger" })
+                                    <label class="control-label" for="input">Country</label><i class="mtrl-select"></i>
+                                </div>
+                                <div class="form-group">
+                                    @Html.DropDownListFor(m => m.Location.CityID, new SelectList(""), "--City--", htmlAttributes: new { @class = "form-control", id = "CityID" })
+                                    @Html.ValidationMessageFor(model => model.Location.CityID, "", new { @class = "text-danger" })
+
+                                    <label class="control-label" for="input">City</label><i class="mtrl-select"></i>
+                                </div>
+                                <div>
+                                    <label>
+                                        @Html.RadioButtonFor(m => m.Gender, "Erkek") Erkek
+                                    </label>
+                                    <label>
+                                        @Html.RadioButtonFor(m => m.Gender, "Kadın") Kadın
+                                    </label>
+                                    @Html.ValidationMessageFor(model => model.Gender, "", new { @class = "text-danger" })
+                                </div>
+                                <a href="/Login/Login" title="" class="already-have">Already have an account</a>
+                                <div class="submit-btns">
+                                    <button type="submit"><span>Register</span></button>
+                                </div>
+                            </form>
+                            @if (ViewBag.Message != null)
+                            {
+                                <div class="alert alert-info">
+                                    <strong>Bilgi!</strong> @ViewBag.Message
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+</body>
+
+</html>
+
+
+
+

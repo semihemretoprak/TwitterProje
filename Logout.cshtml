@@ -1,0 +1,74 @@
+﻿
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winku Social Network Toolkit</title>
+    <link rel="icon" href="images/fav.png" type="image/png" sizes="16x16">
+    @Styles.Render("~/styles/css")
+</head>
+<body>
+    <!--<div class="se-pre-con"></div>-->
+    <div class="theme-layout">
+        <div class="topbar stick">
+            <div class="logo">
+                <a title="" href="newsfeed.html"><img src="images/logo.png" alt=""></a>
+            </div>
+
+            <div class="top-area">
+                <div class="top-search">
+                    <form method="post" class="">
+                        <input type="text" placeholder="Search Friend">
+                        <button data-ripple><i class="ti-search"></i></button>
+                    </form>
+                </div>
+                <div class="login-form">
+                    <form method="post">
+                        <input type="text" placeholder="User Name">
+                        <input type="password" placeholder="Passoword">
+                        <button type="submit">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div><!-- topbar with logout -->
+        <section>
+            <div class="gap100 gray-bg">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="logout-meta">
+                                <h2>logged out</h2>
+                                <span>Do you want to check Janice Griffith’s Profile?</span>
+                                <p>
+                                    Please <a href="landing.html" title="">Login</a> or <a href="landing.html" title="">Register</a> now to create your own profile and have access to all the Winku awesome features!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="bottombar">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <span class="copyright"><a href="templatespoint.net">Templates Point</a></span>
+                        <i><img src="images/credit-cards.png" alt=""></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script data-cfasync="false" src="../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    @Scripts.Render("~/bundles/general")
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8c55_YHLvDHGACkQscgbGLtLRdxBDCfI"></script>
+
+</body>
+
+</html>

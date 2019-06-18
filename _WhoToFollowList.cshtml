@@ -1,0 +1,45 @@
+﻿@model IEnumerable<AppUser>
+<div class="widget stick-widget">
+    <h4 class="widget-title">Who to follow</h4>
+    @foreach (AppUser appUser in Model)
+    {
+        var EkleID = Guid.NewGuid();
+        <ul class="followers">
+            <li id="@EkleID" class="liEkle" style="display:block">
+                <figure><img src="@appUser" alt=""></figure>
+                <div class="friend-meta">
+                    <h4>@Html.ActionLink(appUser.UserName, "TimeLineFriend", "Home", new { id = appUser.ID }, null)</h4>
+                    <button id="@appUser.ID" class="btn success ekle">Add Friend</button>
+                </div>
+            </li>
+        </ul>
+    }
+</div><!-- Who to follow -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(this).on("click", ".ekle", function () {
+            var id = $(this).attr("id");
+            var divid = $(".liEkle").attr("id");
+            var x = document.getElementById(divid);
+            $.ajax({
+                url: '/Administrator/Follower/Index',
+                type: 'POST',
+                data: { ID: id },
+                success: function (data) {
+                    location.reload();
+                    if (data.result == 1) {
+                        if (x.style.display === "none") {
+                            x.style.display = "block";
+                        } else {
+                            x.style.display = "none";
+                        }
+                        alert(data.message);
+                    }
+                    else
+                        location.reload();
+                }
+            });
+        });
+    });
+</script>
